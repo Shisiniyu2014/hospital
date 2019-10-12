@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 
+namespace : 类路径
+	与此映射文件关联的接口文件路径
+ -->
+<mapper namespace="com.zhiyou100.mapper.RegistrationMapper">
+	
+	<resultMap type="RegistrationInfor" id="regDocResMap">
+		<id column="medical_record" property="medical_record"/>
+		<result column="name" property="name"/>
+		<result column="certificate_type" property="certificate_type"/>
+		<result column="id_num" property="id_num"/>
+		<result column="social_safe_num" property="social_safe_num"/>
+		<result column="phone" property="phone"/>
+		<result column="special_plane" property="special_plane"/>
+		<result column="self_paying" property="self_paying"/>
+		<result column="sex" property="sex"/>
+		<result column="career" property="career"/>
+		<result column="early_appointment" property="early_appointment"/>
+		<result column="doctor_id" property="doctor_id"/>
+		<result column="status" property="status"/>
+		<result column="noted" property="noted"/>
+		<result column="time" property="time"/>
+		<result column="section_id" property="section_id"/>
+		<result column="age" property="age"/>
+		<result column="registration_fee" property="registration_fee"/>
+		
+		<!-- 使用一对一映射标签 
+			property : 属性,写的是需要关联映射的属性
+			javaType : 需要封装的另外一个类的类型
+						 类路径 (因为已经指定了别名)
+		-->
+		<association property="doctor" javaType="Doctor">
+			<id column="id" property="id"/>
+			<result column="dname" property="name"/>
+		
+		</association>
+		<association property="section" javaType="Section">
+			<id column="id" property="id"/>
+			<result column="seccp_num" property="seccp_num"/>
+			<result column="sname" property="secco_name"/>
+		</association>
+		<association property="certificateType" javaType="CertificateType">
+			<id column="id" property="id"/>
+			<result column="cname" property="name"/>
+			
+		</association>
+	</resultMap>
+	
+	<sql id="registrationSql">
+	r.medical_record medical_record,
+	r.age age,
+	r.career career,
+	r.certificate_type certificate_type,
+	r.name name,
+	r.ID_num ID_num,
+	r.social_safe_num social_safe_num,
+	r.phone phone,
+	r.self_paying self_paying,
+	r.sex sex,
+	r.early_appointment early_appointment,
+	r.doctor_id,
+	r.status status,
+	r.noted noted,
+	r.time time,
+	r.section_id section_id,
+	r.registration_fee registration_fee
+</sql>
+
+
+<select id="findAll" parameterType="Map" resultMap="regDocResMap">
+	SELECT
+		<include refid="registrationSql"/>,
+		d.name dname,
+		c.name cname,
+		s.secco_name sname
+	FROM	
+		registration_infor r,
+		doctor d,
+		section s,
+		certificate_type c
+	WHERE
+	 r.doctor_id = d.id and r.section_id = s.id and r.certificate_type = c.id
+		<if test="medical_record != null and medical_record != ''">
+				and r.medical_record like '%${medical_record}%' 
+		</if>
+		<if test="dname != null and dname != ''">
+				and d.name like '%${dname}%' 
+		</if>
+		<if test="section != null and section != ''">
+				and s.secco_name like '%${section}%' 
+		</if>
+		<if test="time1 != null and time1 != '' and time2 != null and time2 != ''">
+				and r.time &gt; '${time1}' and r.time &lt; '${time2}'
+		</if>
+</select>
+
+<select id="findOne" parameterType="String" resultMap="regDocResMap">
+	SELECT
+		<include refid="registrationSql"/>,
+		d.name dname,
+		c.name cname,
+		s.secco_name sname
+	FROM	
+		registration_infor r,
+		doctor d,
+		section s,
+		certificate_type c
+	WHERE
+	 r.doctor_id = d.id and r.section_id = s.id and r.certificate_type = c.id and r.medical_record = #{id}
+</select>
+
+<update id="editOne" parameterType="RegistrationInfor">
+	UPDATE  
+		registration_infor	
+	SET 
+		name = #{name},
+		certificate_type = #{certificate_type},
+		ID_num = #{id_num},
+		registration_fee = #{registration_fee},
+		social_safe_num = #{social_safe_num},
+		phone = #{phone},
+		self_paying = #{self_paying},
+		sex = #{sex},
+		age = #{age},
+		career = #{career},
+		early_appointment = #{early_appointment},
+		section_id = #{section_id},
+		doctor_id = #{doctor_id},
+		noted = #{noted} 
+		where medical_record = #{medical_record}
+</update>
+
+<insert id="addReg" parameterType="RegistrationInfor">
+	INSERT INTO
+		registration_infor
+		(name,
+		certificate_type,
+		ID_num,
+		social_safe_num,
+		registration_fee,
+		phone,
+		self_paying,
+		sex,
+		age,
+		career,
+		early_appointment,
+		section_id,
+		doctor_id,
+		noted,
+		time)
+	VALUES
+		(#{name},
+		#{certificate_type},
+		#{id_num},
+		#{social_safe_num},
+		#{registration_fee},
+		#{phone},
+		#{self_paying},
+		#{sex},
+		#{age},
+		#{career},
+		#{early_appointment},
+		#{section_id},
+		#{doctor_id},
+		#{noted},
+		#{time})
+</insert>
+
+<delete id="delRegs"  >
+	delete from registration_infor where medical_record in 
+		<foreach collection="array" item="ee"  open="(" separator="," close=")">  
+            #{ee}
+       </foreach>
+</delete>
+
+
+<delete id="delOne" parameterType="String">
+	delete from registration_infor where medical_record = #{id}
+</delete>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	
+	<!-- jdbc.properties文件,交给Spring加载 -->
+	
+	<typeAliases>
+		<package name="com.zhiyou100.model"/>
+	</typeAliases>
+	
+	<!-- 数据源交给Spring去托管 -->
+	<!-- Mapper加载交给Spring托管 -->
+</configuration>

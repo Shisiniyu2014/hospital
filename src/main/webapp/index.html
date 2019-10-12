@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<h1>注册</h1>
+<form action="">
+	<input type="text" name="username" id="i1"><br>
+	<input type="password" name="password" id="i2"><br>
+	<input type="submit" value="注册" id="i3">
+</form>
+</body>
+<script type="text/javascript" src="Js/jquery.js"></script>
+<script type="text/javascript">
+//绑定失去焦点事件
+$("#i1").blur(function(){
+	//获得输入的值
+	var val = $("#i1").val();
+	//异常发送请求:ajax
+	$.ajax({
+	url:"/hospital/checkUser",
+	type:"POST",
+	data:{"usernameJsonkey":val},
+	success:function(msg){  // 返回状态码
+		if(JSON.parse(msg).code == 200){
+			//没查到,可以注册
+			$("#s1").remove();
+			$("#i3").removeAttr("disabled");
+			$("#i1").after("<span id='s1'>可以</span>");
+			$("#s1").css("color","green");
+			
+		}else{
+			// 查到,禁止重复注册
+			$("#s1").remove();
+			$("#i1").after("<span id='s1'>不行</span>");
+			$("#s1").css("color","red");
+			$("#i3").attr("disabled","disabled");
+		}
+	},
+	error:function(){
+		alert("服务器正忙");
+	}
+	});
+});
+
+
+</script>
+</html>

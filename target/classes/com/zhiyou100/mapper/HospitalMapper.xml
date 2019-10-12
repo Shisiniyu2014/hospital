@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 
+namespace : 类路径
+	与此映射文件关联的接口文件路径
+ -->
+<mapper namespace="com.zhiyou100.mapper.HospitalMapper">
+	
+	<resultMap type="RegistrationInfor" id="regDocResHMap">
+		<id column="medical_record" property="medical_record"/>
+		<result column="name" property="name"/>
+		<result column="certificate_type" property="certificate_type"/>
+		<result column="id_num" property="id_num"/>
+		<result column="social_safe_num" property="social_safe_num"/>
+		<result column="phone" property="phone"/>
+		<result column="special_plane" property="special_plane"/>
+		<result column="self_paying" property="self_paying"/>
+		<result column="sex" property="sex"/>
+		<result column="career" property="career"/>
+		<result column="early_appointment" property="early_appointment"/>
+		<result column="doctor_id" property="doctor_id"/>
+		<result column="status" property="status"/>
+		<result column="noted" property="noted"/>
+		<result column="time" property="time"/>
+		<result column="section_id" property="section_id"/>
+		<result column="age" property="age"/>
+		<result column="registration_fee" property="registration_fee"/>
+		
+		<!-- 使用一对一映射标签 
+			property : 属性,写的是需要关联映射的属性
+			javaType : 需要封装的另外一个类的类型
+						 类路径 (因为已经指定了别名)
+		-->
+		<association property="doctor" javaType="Doctor">
+			<id column="id" property="id"/>
+			<result column="dname" property="name"/>
+		
+		</association>
+		<association property="section" javaType="Section">
+			<id column="id" property="id"/>
+			<result column="seccp_num" property="seccp_num"/>
+			<result column="sname" property="secco_name"/>
+		</association>
+		<association property="certificateType" javaType="CertificateType">
+			<id column="id" property="id"/>
+			<result column="cname" property="name"/>
+			
+		</association>
+		<association property="hospitalInfor" javaType="HospitalInfor">
+			<id column="h_m_record" property="medical_record"/>
+			<result column="caregiver" property="caregiver"/>
+			<result column="bed_id" property="bed_id"/>
+			<result column="pay_the_deposit" property="pay_the_deposit"/>
+			<result column="state_illness" property="state_illness"/>
+			
+		</association>
+	</resultMap>
+	
+	<sql id="registrationSql">
+		r.medical_record medical_record,
+		r.age age,
+		r.career career,
+		r.certificate_type certificate_type,
+		r.name name,
+		r.ID_num ID_num,
+		r.social_safe_num social_safe_num,
+		r.phone phone,
+		r.self_paying self_paying,
+		r.sex sex,
+		r.early_appointment early_appointment,
+		r.doctor_id,
+		r.status status,
+		r.noted noted,
+		r.time time,
+		r.section_id section_id,
+		r.registration_fee registration_fee
+	</sql>
+	
+	<sql id="hospitalInforSql">
+		h.medical_record h_m_record,
+		h.caregiver caregiver,
+		h.bed_id bed_id,
+		h.pay_the_deposit pay_the_deposit,
+		h.state_illness state_illness
+	</sql>
+	
+	
+	<select id="findAll" parameterType="Map" resultMap="regDocResHMap">
+	SELECT
+		<include refid="registrationSql"/>,
+		d.name dname,
+		c.name cname,
+		s.secco_name sname,
+		<include refid="hospitalInforSql"/>
+	FROM	
+		registration_infor r,
+		doctor d,
+		section s,
+		certificate_type c,
+		hospital_infor h
+	WHERE
+	 r.doctor_id = d.id and r.section_id = s.id and r.certificate_type = c.id and r.medical_record = h.medical_record
+		<if test="medical_record != null and medical_record != ''">
+				and r.medical_record like '%${medical_record}%' 
+		</if>
+		<if test="dname != null and dname != ''">
+				and d.name like '%${dname}%' 
+		</if>
+		<if test="section != null and section != ''">
+				and s.secco_name like '%${section}%' 
+		</if>
+		<if test="time1 != null and time1 != '' and time2 != null and time2 != ''">
+				and r.time &gt; '${time1}' and r.time &lt; '${time2}'
+		</if>
+</select>
+
+<insert id="addHos" parameterType="HospitalInfor">
+	insert into hospital_infor values (#{medical_record},#{caregiver},#{bed_id},#{pay_the_deposit},#{state_illness})
+</insert>
+
+
+<select id="findRegHos" parameterType="String" resultMap="regDocResHMap">
+	SELECT
+		<include refid="registrationSql"/>,
+		
+		<include refid="hospitalInforSql"/>
+	FROM	
+		registration_infor r,
+		
+		hospital_infor h
+	WHERE 
+		r.medical_record = h.medical_record and r.medical_record = #{id}
+</select>
+
+<update id="editHos" parameterType="HospitalInfor">
+	update 
+		hospital_infor 
+	set 
+		caregiver=#{caregiver},
+		bed_id=#{bed_id},
+		pay_the_deposit=#{pay_the_deposit} 
+	where 
+		medical_record = #{medical_record}
+</update>
+
+<!-- 单个删除 -->
+<delete id="delReg" parameterType="String">
+	delete from registration_infor where medical_record = #{id}
+</delete>
+<delete id="delHos" parameterType="String">
+	delete from hospital_infor where medical_record = #{id}
+</delete>
+
+<!-- 批量删除 -->
+<delete id="delRegs">
+	delete from registration_infor where medical_record in 
+		<foreach collection="array" item="ids"  open="(" separator="," close=")">  
+            #{ids}
+       </foreach>
+</delete>
+<delete id="delHoss">
+delete from hospital_infor where medical_record in 
+		<foreach collection="array" item="ids"  open="(" separator="," close=")">  
+            #{ids}
+       </foreach>
+</delete>
+
+
+
+
+
+
+
+
+
+
+</mapper>

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 
+namespace : 类路径
+	与此映射文件关联的接口文件路径
+ -->
+<mapper namespace="com.zhiyou100.mapper.ChargeMapper">
+	
+	<resultMap type="RegistrationInfor" id="regPayChaMap">
+		<id column="medical_record" property="medical_record"/>
+		<result column="name" property="name"/>
+		<result column="certificate_type" property="certificate_type"/>
+		<result column="id_num" property="id_num"/>
+		<result column="social_safe_num" property="social_safe_num"/>
+		<result column="phone" property="phone"/>
+		<result column="special_plane" property="special_plane"/>
+		<result column="self_paying" property="self_paying"/>
+		<result column="sex" property="sex"/>
+		<result column="career" property="career"/>
+		<result column="early_appointment" property="early_appointment"/>
+		<result column="doctor_id" property="doctor_id"/>
+		<result column="status" property="status"/>
+		<result column="noted" property="noted"/>
+		<result column="time" property="time"/>
+		<result column="section_id" property="section_id"/>
+		<result column="age" property="age"/>
+		<result column="registration_fee" property="registration_fee"/>
+		
+		<!-- 使用一对一映射标签 
+			property : 属性,写的是需要关联映射的属性
+			javaType : 需要封装的另外一个类的类型
+						 类路径 (因为已经指定了别名)
+		-->
+		
+		<association property="payItems" javaType="PayItems">
+			<id column="id" property="id"/>
+			<result column="charge_item_name" property="charge_item_name"/>
+			<result column="receivable_money" property="receivable_money"/>
+		</association>
+		
+		<association property="chargeManager" javaType="ChargeManager">
+			<id column="cid" property="id"/>
+			<result column="c_m_record" property="medical_record"/>
+			<result column="pay_items_id" property="pay_items_id"/>
+			<result column="charge_money" property="charge_money"/>
+			<result column="charge_time" property="charge_time"/>
+			
+		</association>
+	</resultMap>
+	
+	<sql id="registrationSql">
+		r.medical_record medical_record,
+		r.age age,
+		r.career career,
+		r.certificate_type certificate_type,
+		r.name name,
+		r.ID_num ID_num,
+		r.social_safe_num social_safe_num,
+		r.phone phone,
+		r.self_paying self_paying,
+		r.sex sex,
+		r.early_appointment early_appointment,
+		r.doctor_id,
+		r.status status,
+		r.noted noted,
+		r.time time,
+		r.section_id section_id,
+		r.registration_fee registration_fee
+	</sql>
+
+	<sql id="chargeManagerSql">
+		c.id cid,
+		c.medical_record c_m_record,
+		c.pay_items_id pay_items_id,
+		c.charge_money charge_money,
+		c.charge_time charge_time
+	</sql>
+
+	<sql id="payItemsSql">
+		p.id id,
+		p.charge_item_name charge_item_name,
+		p.receivable_money receivable_money
+	</sql>
+
+	<select id="findAll" parameterType="Map" resultMap="regPayChaMap">
+		select 
+			<include refid="registrationSql"/>,
+			<include refid="chargeManagerSql"/>,
+			<include refid="payItemsSql"/> 
+		from 
+			registration_infor r,
+			charge_manager c,
+			pay_items p 
+		where 
+			r.medical_record = c.medical_record and c.pay_items_id = p.id
+		<if test="medical_record != null and medical_record != ''">
+				and r.medical_record like '%${medical_record}%' 
+		</if>
+		<if test="name != null and name != ''">
+				and r.name like '%${name}%' 
+		</if>
+	</select>
+
+	<select id="findOne" parameterType="String" resultType="RegistrationInfor">
+		select 
+			* 
+		from 
+			registration_infor 
+		where 
+			medical_record = #{id}
+	</select>
+
+	<select id="findPayOne" parameterType="String" resultType="PayItems">
+		select 
+			* 
+		from 
+			pay_items 
+		where 
+			charge_item_name = #{charge_item_name}
+	</select>
+
+	<insert id="addOne" parameterType="Map">
+		insert into 
+			charge_manager 
+			(medical_record,pay_items_id,charge_money,charge_time) 
+		values 
+			(#{medical_record},
+			(select id from pay_items where charge_item_name = #{charge_item_name}),
+			#{charge_money},
+			#{time})
+	
+	</insert>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

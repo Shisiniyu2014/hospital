@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 
+namespace : 类路径
+	与此映射文件关联的接口文件路径
+ -->
+<mapper namespace="com.zhiyou100.mapper.DrugMapper">
+	
+	<select id="findAll" parameterType="Map" resultType="Drug">
+		SELECT * FROM 
+			drug
+		<where>
+			<if test="drug_num != null and drug_num != ''">
+				drug_num like '%${drug_num}%'
+			</if>
+			<if test="drug_num != null and drug_num != '' and drug_type != null and drug_type != ''">
+		AND	
+			</if>
+			<if test="drug_type != null and drug_type != ''">
+				drug_type like '%${drug_type}%'
+			</if>
+		</where>
+	</select>
+	
+	<select id="findOne" parameterType="String" resultType="Drug">
+		select * from drug where drug_num = #{id}
+	</select>
+	
+	<insert id="addDrug" parameterType="Drug">
+		INSERT INTO
+			drug
+		VALUES
+			(#{drug_num},
+			#{drug_url},
+			#{purchas_price},
+			#{sale_price},
+			#{drug_name},
+			#{drug_type},
+			#{simple_detail},
+			#{prodeced_date},
+			#{expiration_date},
+			#{quality_date},
+			#{detail},
+			#{manufacture},
+			#{use_infor},
+			#{total_stock},
+			#{surplus},
+			#{status},
+			#{noted})
+	</insert>
+	
+	
+	<update id="editDrug" parameterType="Drug">
+		UPDATE 
+			drug
+		SET
+			drug_url = #{drug_url},
+			purchas_price = #{purchas_price},
+			sale_price = #{sale_price},
+			drug_name = #{drug_name},
+			drug_type = #{drug_type},
+			simple_detail = #{simple_detail},
+			prodeced_date = #{prodeced_date},
+			expiration_date = #{expiration_date},
+			quality_date = #{quality_date},
+			detail = #{detail},
+			manufacture = #{manufacture},
+			use_infor = #{use_infor},
+			total_stock = #{total_stock},
+			surplus = #{surplus},
+			status = #{status},
+			noted = #{noted}
+		WHERE
+			drug_num = #{drug_num}
+	</update>
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</mapper>

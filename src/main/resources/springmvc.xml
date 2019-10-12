@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+    		http://www.springframework.org/schema/beans 
+    		http://www.springframework.org/schema/beans/spring-beans.xsd
+    		http://www.springframework.org/schema/mvc
+        	http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        	http://www.springframework.org/schema/context
+       		http://www.springframework.org/schema/context/spring-context.xsd">
+       		
+       		
+    <!-- 配置文件上传组件
+	 		把id属性写出 : 
+	  -->        
+        <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="9999999"></property>
+        
+        </bean>
+       		
+       		
+       		
+	
+	<!-- 1 : 
+		配置适用于 注解开发的适配器和映射器
+	 -->
+	<mvc:annotation-driven />
+	<!-- 2:
+		开启扫描,使注解生效
+		扫描到哪一个有注解的包
+	 -->
+	<context:component-scan base-package="com.zhiyou100.controller">
+		<!-- 只扫描Controller -->
+		<context:include-filter type="annotation" 
+			expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+	
+   <!-- 视图解析器 -->
+	<bean 
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<!-- 视图解析的前缀 / 就是根目录
+			如图页面放在WEB-INF下 /WEB-INF/
+		 -->
+		<property name="prefix" value="/WEB-INF/"></property>
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+	
+	<!-- 静态资源映射 -->
+	<mvc:resources location="/WEB-INF/assets/" mapping="/assets/**"/>
+	<mvc:resources location="/WEB-INF/Css/" mapping="/Css/**"/>
+	<mvc:resources location="/WEB-INF/front/" mapping="/front/**"/>
+	<mvc:resources location="/WEB-INF/Images/" mapping="/Images/**"/>
+	<mvc:resources location="/WEB-INF/Js/" mapping="/Js/**"/>
+	<mvc:resources location="/WEB-INF/dist/" mapping="/dist/**"/>
+	<mvc:resources location="/WEB-INF/layui/" mapping="/layui/**"/>
+	<mvc:resources location="/WEB-INF/drug/" mapping="/drug/**"/>
+	<mvc:resources location="/upload/" mapping="/upload/**" />
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</beans>
